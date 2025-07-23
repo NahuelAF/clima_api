@@ -1,5 +1,7 @@
 <?php
 header('Content-Type: application/json');
+header('X-Content-Type-Options: nosniff');
+
 
 $apiKey = 'fd98ba58b1ad47bceb91b394076825ac';
 
@@ -9,8 +11,8 @@ if (isset($_POST['units']) && in_array($_POST['units'], ['metric', 'imperial']))
 }
 
 $byCoords = isset($_POST['lat']) && isset($_POST['lon']);
-$lat = $_POST['lat'] ?? null;
-$lon = $_POST['lon'] ?? null;
+$lat = isset($_POST['lat']) ? filter_var($_POST['lat'], FILTER_VALIDATE_FLOAT) : null;
+$lon = isset($_POST['lon']) ? filter_var($_POST['lon'], FILTER_VALIDATE_FLOAT) : null;
 $city = isset($_POST['city']) ? urlencode(trim($_POST['city'])) : null;
 
 if ($byCoords) {

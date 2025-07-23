@@ -322,3 +322,10 @@ body.dark-mode .forecast-card:hover {
     height: 50px;
   }
 }
+
+/* Accesibilidad: foco visible */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #ffcc00;
+  outline-offset: 2px;
+}
