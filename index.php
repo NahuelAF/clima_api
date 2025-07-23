@@ -74,6 +74,6 @@
     </section>
   </main>
 
-  <script type="module" src="assets/js/app.js"></script>
+  <script src="assets/js/weather.bundle.js" defer></script>
 </body>
 </html>
