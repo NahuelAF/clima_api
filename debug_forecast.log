@@ -1,0 +1,57 @@
+Array
+(
+    [2025-07-23] => Array
+        (
+            [date] => 2025-07-23
+            [temp_min] => 9
+            [temp_max] => 9
+            [description] => nubes
+            [icon] => 04d
+        )
+
+    [2025-07-24] => Array
+        (
+            [date] => 2025-07-24
+            [temp_min] => 8
+            [temp_max] => 8
+            [description] => nubes
+            [icon] => 04d
+        )
+
+    [2025-07-25] => Array
+        (
+            [date] => 2025-07-25
+            [temp_min] => 8
+            [temp_max] => 8
+            [description] => muy nuboso
+            [icon] => 04d
+        )
+
+    [2025-07-26] => Array
+        (
+            [date] => 2025-07-26
+            [temp_min] => 6
+            [temp_max] => 6
+            [description] => nubes
+            [icon] => 04d
+        )
+
+    [2025-07-27] => Array
+        (
+            [date] => 2025-07-27
+            [temp_min] => 5
+            [temp_max] => 5
+            [description] => nubes
+            [icon] => 04d
+        )
+
+    [2025-07-28] => Array
+        (
+            [date] => 2025-07-28
+            [temp_min] => 4
+            [temp_max] => 4
+            [description] => muy nuboso
+            [icon] => 04d
+        )
+
+)
