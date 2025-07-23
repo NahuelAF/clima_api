@@ -8,6 +8,11 @@ const toggleThemeBtn = document.getElementById('toggleTheme');
 const getLocationBtn = document.getElementById('getLocation');
 const header = document.querySelector('.header');
 
+function degToCardinal(deg) {
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  return directions[Math.round(deg / 45) % 8];
+}
+
 async function fetchWeather(city) {
   resultDiv.innerHTML = 'Consultando clima...';
   forecastDiv.innerHTML = '';
@@ -27,6 +32,7 @@ async function fetchWeather(city) {
       return;
     }
 
+    localStorage.setItem('lastCity', city);
     renderWeather(data);
 
   } catch (error) {
@@ -51,6 +57,7 @@ async function fetchWeatherByLocation(lat, lon) {
 
     if (data.name) {
       cityInput.value = data.name;
+      localStorage.setItem('lastCity', data.name);
     }
 
     if (data.error) {
@@ -85,17 +92,13 @@ function renderWeather(data) {
   }).format(localDate);
 
   let precipitation = '0 mm';
-  if (data.rain?.['1h']) {
+  if (data.rain && data.rain['1h']) {
     precipitation = `${data.rain['1h']} mm (lluvia)`;
-  } else if (data.snow?.['1h']) {
+  } else if (data.snow && data.snow['1h']) {
     precipitation = `${data.snow['1h']} mm (nieve)`;
   }
 
-  function degToCardinal(deg) {
-    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    return directions[Math.round(deg / 45) % 8];
-  }
-  const windDirection = data.wind?.deg ? degToCardinal(data.wind.deg) : 'N/A';
+  const windDirection = data.wind && data.wind.deg ? degToCardinal(data.wind.deg) : 'N/A';
 
   const mainHeaderHTML = `
     <div class="main-header">
@@ -118,7 +121,6 @@ function renderWeather(data) {
 
   resultDiv.innerHTML = mainHeaderHTML + weatherInfoHTML;
 
-  // Pronóstico
   if (Array.isArray(data.forecast) && data.forecast.length > 0) {
     const nowUTC = new Date();
     const now = new Date(nowUTC.getTime() + data.timezone * 1000);
@@ -149,7 +151,6 @@ function renderWeather(data) {
   }
 }
 
-// Ocultar header al hacer scroll
 function handleHeaderOpacity() {
   const scrollY = window.scrollY || window.pageYOffset;
   const fadeStart = 20;
@@ -168,18 +169,50 @@ function handleHeaderOpacity() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Intentar ubicación automática
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        fetchWeatherByLocation(pos.coords.latitude, pos.coords.longitude);
+      async position => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          // Reverse geocode para obtener país y ajustar unidad
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
+          const data = await response.json();
+          const country = data.address && data.address.country_code ? data.address.country_code.toUpperCase() : null;
+
+          const fahrenheitCountries = ['US', 'BS', 'BZ']; // Países que usan °F
+
+          if (country && fahrenheitCountries.includes(country)) {
+            if (currentUnit !== 'imperial') {
+              currentUnit = 'imperial';
+              toggleUnitBtn.textContent = '°F';
+            }
+          }
+        } catch {
+          // Ignorar error en reverse geocode
+        }
+
+        fetchWeatherByLocation(latitude, longitude);
       },
       () => {
-        fetchWeather('Buenos Aires');
+        // Si el usuario no da permiso, busca la última ciudad guardada o Buenos Aires
+        const savedCity = localStorage.getItem('lastCity');
+        if (savedCity) {
+          fetchWeather(savedCity);
+          cityInput.value = savedCity;
+        } else {
+          fetchWeather('Buenos Aires');
+        }
       }
     );
   } else {
-    fetchWeather('Buenos Aires');
+    const savedCity = localStorage.getItem('lastCity');
+    if (savedCity) {
+      fetchWeather(savedCity);
+      cityInput.value = savedCity;
+    } else {
+      fetchWeather('Buenos Aires');
+    }
   }
 
   handleHeaderOpacity();
