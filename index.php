@@ -49,6 +49,7 @@
     <div id="forecastResult" class="forecast-container"></div>
   </main>
 
-  <script src="assets/js/script.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
+
 </body>
 </html>
